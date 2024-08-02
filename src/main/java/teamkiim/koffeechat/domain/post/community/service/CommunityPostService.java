@@ -3,30 +3,31 @@ package teamkiim.koffeechat.domain.post.community.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import teamkiim.koffeechat.domain.bookmark.service.BookmarkService;
 import teamkiim.koffeechat.domain.file.service.FileService;
-import teamkiim.koffeechat.domain.postlike.service.PostLikeService;
-import teamkiim.koffeechat.global.exception.CustomException;
-import teamkiim.koffeechat.global.exception.ErrorCode;
 import teamkiim.koffeechat.domain.member.domain.Member;
 import teamkiim.koffeechat.domain.member.repository.MemberRepository;
 import teamkiim.koffeechat.domain.post.community.domain.CommunityPost;
-import teamkiim.koffeechat.domain.post.community.repository.CommunityPostRepository;
 import teamkiim.koffeechat.domain.post.community.dto.request.ModifyCommunityPostServiceRequest;
 import teamkiim.koffeechat.domain.post.community.dto.request.SaveCommunityPostServiceRequest;
 import teamkiim.koffeechat.domain.post.community.dto.response.CommentInfoDto;
 import teamkiim.koffeechat.domain.post.community.dto.response.CommunityPostListResponse;
 import teamkiim.koffeechat.domain.post.community.dto.response.CommunityPostResponse;
 import teamkiim.koffeechat.domain.post.community.dto.response.VoteResponse;
+import teamkiim.koffeechat.domain.post.community.repository.CommunityPostRepository;
 import teamkiim.koffeechat.domain.postlike.repository.PostLikeRepository;
+import teamkiim.koffeechat.domain.postlike.service.PostLikeService;
 import teamkiim.koffeechat.domain.vote.domain.Vote;
-import teamkiim.koffeechat.domain.vote.repository.VoteRepository;
-import teamkiim.koffeechat.domain.vote.service.VoteService;
 import teamkiim.koffeechat.domain.vote.dto.request.ModifyVoteServiceRequest;
 import teamkiim.koffeechat.domain.vote.dto.request.SaveVoteServiceRequest;
+import teamkiim.koffeechat.domain.vote.repository.VoteRepository;
+import teamkiim.koffeechat.domain.vote.service.VoteService;
+import teamkiim.koffeechat.global.exception.CustomException;
+import teamkiim.koffeechat.global.exception.ErrorCode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,6 +50,7 @@ public class CommunityPostService {
 
     /**
      * 게시글 최초 임시 저장
+     *
      * @param memberId 작성자 PK
      * @return Long 게시글 PK
      */
@@ -65,11 +67,12 @@ public class CommunityPostService {
 
         CommunityPost saveCommunityPost = communityPostRepository.save(communityPost);
 
-        return ResponseEntity.ok(saveCommunityPost.getId());
+        return ResponseEntity.status(HttpStatus.CREATED).body(saveCommunityPost.getId());
     }
 
     /**
      * 커뮤니티 게시글 작성 취소
+     *
      * @param postId 게시글 PK
      * @return ok
      */
@@ -83,13 +86,14 @@ public class CommunityPostService {
 
         communityPostRepository.delete(communityPost);
 
-        return ResponseEntity.ok("게시글 삭제 완료");
+        return ResponseEntity.ok("게시글 작성 취소 완료");
     }
 
     /**
      * 게시글 저장
+     *
      * @param saveCommunityPostServiceRequest 게시글 저장 dto
-     * @return CommunityPostResponse
+     * @return CommunityPostResponse HttpStatus created
      */
     @Transactional
     public ResponseEntity<?> saveCommunityPost(SaveCommunityPostServiceRequest saveCommunityPostServiceRequest,
@@ -108,16 +112,20 @@ public class CommunityPostService {
         List<CommentInfoDto> commentInfoDtoList = new ArrayList<>();
 
         if (saveVoteServiceRequest == null) {  //투표 x
-            return ResponseEntity.ok(CommunityPostResponse.of(communityPost, commentInfoDtoList, null, memberId, false, false));
-            }
+            return ResponseEntity.status(HttpStatus.CREATED).body(CommunityPostResponse.of(communityPost, commentInfoDtoList, null, memberId, false, false));
+
+        }
 
         //투표 o
         Vote savedVote = voteService.saveVote(saveVoteServiceRequest, saveCommunityPostServiceRequest.getId());  //투표 저장
-        return ResponseEntity.ok(CommunityPostResponse.of(communityPost, commentInfoDtoList, VoteResponse.of(savedVote, true), memberId, false, false));
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(CommunityPostResponse.of(communityPost, commentInfoDtoList, VoteResponse.of(savedVote, true), memberId, false, false));
+
     }
 
     /**
      * 게시글 목록 조회
+     *
      * @param page 페이지 번호 ( ex) 0, 1,,,, )
      * @param size 페이지 당 조회할 데이터 수
      * @return List<CommunityPostListResponse>
@@ -136,6 +144,7 @@ public class CommunityPostService {
 
     /**
      * 게시글 상세 조회
+     *
      * @param postId postId 게시글 PK
      * @return CommunityPostResponse
      */
@@ -156,8 +165,7 @@ public class CommunityPostService {
         if (vote.isPresent()) {
             boolean isMemberVoted = voteService.hasMemberVoted(vote.get(), member);
             voteResponse = VoteResponse.of(vote.get(), isMemberVoted);
-        }
-        else voteResponse = null;
+        } else voteResponse = null;
 
         boolean isMemberBookmarked = bookmarkService.isMemberBookmarked(member, communityPost);
 
@@ -166,6 +174,7 @@ public class CommunityPostService {
 
     /**
      * 게시글 수정
+     *
      * @param modifyCommunityPostServiceRequest 게시글 수정 dto
      * @return CommunityPostResponse
      */
@@ -205,6 +214,6 @@ public class CommunityPostService {
 
         boolean isMemberBookmarked = bookmarkService.isMemberBookmarked(member, communityPost);
 
-        return ResponseEntity.ok(CommunityPostResponse.of(communityPost, commentInfoDtoList, voteResponse, memberId, isMemberLiked, isMemberBookmarked));
+        return ResponseEntity.status(HttpStatus.CREATED).body(CommunityPostResponse.of(communityPost, commentInfoDtoList, voteResponse, memberId, isMemberLiked, isMemberBookmarked));
     }
 }

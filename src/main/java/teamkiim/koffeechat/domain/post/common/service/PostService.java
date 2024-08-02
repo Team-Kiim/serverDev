@@ -3,6 +3,7 @@ package teamkiim.koffeechat.domain.post.common.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,7 +56,7 @@ public class PostService {
             post.addLike();
         }
 
-        return ResponseEntity.ok(post.getLikeCount());
+        return ResponseEntity.status(HttpStatus.CREATED).body(post.getLikeCount());
     }
 
     /**
@@ -81,7 +82,7 @@ public class PostService {
             post.addBookmark();
         }
 
-        return ResponseEntity.ok(post.getBookmarkCount());
+        return ResponseEntity.status(HttpStatus.CREATED).body(post.getBookmarkCount());
     }
 
     /**
@@ -122,7 +123,7 @@ public class PostService {
 
         post.delete();
 
-        return ResponseEntity.ok("게시글이 삭제되었습니다.");
+        return ResponseEntity.status(HttpStatus.CREATED).body(post.getId());
     }
 
 }

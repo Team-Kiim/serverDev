@@ -3,6 +3,7 @@ package teamkiim.koffeechat.domain.post.dev.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -58,7 +59,7 @@ public class DevPostService {
 
         DevPost saveDevPost = devPostRepository.save(devPost);
 
-        return ResponseEntity.ok(saveDevPost.getId());
+        return ResponseEntity.status(HttpStatus.CREATED).body(saveDevPost.getId());
     }
 
     /**
@@ -95,7 +96,7 @@ public class DevPostService {
 
         fileService.deleteImageFiles(saveDevPostServiceRequest.getFileIdList(), devPost);
 
-        return ResponseEntity.ok(DevPostResponse.of(devPost, memberId, false, false));
+        return ResponseEntity.status(HttpStatus.CREATED).body(DevPostResponse.of(devPost, memberId, false, false));
     }
 
     /**
@@ -165,7 +166,7 @@ public class DevPostService {
 
         boolean isMemberBookmarked = bookmarkService.isMemberBookmarked(member, devPost);
 
-        return ResponseEntity.ok(DevPostResponse.of(devPost, memberId, isMemberLiked,isMemberBookmarked ));
+        return ResponseEntity.status(HttpStatus.CREATED).body(DevPostResponse.of(devPost, memberId, isMemberLiked,isMemberBookmarked ));
     }
 
 

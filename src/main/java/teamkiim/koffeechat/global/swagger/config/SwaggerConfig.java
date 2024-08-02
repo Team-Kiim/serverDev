@@ -15,7 +15,7 @@ public class SwaggerConfig {
     public OpenAPI openAPI(){
 
         Info info = new Info()
-                .title("KoffeChat API Document")
+                .title("KoffeeChat API Document")
                 .description("CBNU SW 졸업작품 KoffeeChat 프로젝트의 API 명세서");
 
         return new OpenAPI()

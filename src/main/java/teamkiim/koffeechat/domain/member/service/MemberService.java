@@ -1,6 +1,7 @@
 package teamkiim.koffeechat.domain.member.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,7 +44,7 @@ public class MemberService {
 
         member.modify(modifyProfileServiceRequest.getNickname(), modifyProfileServiceRequest.getMemberRole());
 
-        return ResponseEntity.ok("회원 정보 수정 완료");
+        return ResponseEntity.status(HttpStatus.CREATED).body("회원 정보 수정 완료");
     }
 
     /**
@@ -65,7 +66,7 @@ public class MemberService {
 
         member.enrollSkillCategory(skillCategoryList);
 
-        return ResponseEntity.ok("관심 기술 설정 완료");
+        return ResponseEntity.status(HttpStatus.CREATED).body("관심 기술 설정 완료");
     }
 
     /**
@@ -84,7 +85,7 @@ public class MemberService {
 
         member.enrollProfileImage(response.getProfileImageName());
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     /**

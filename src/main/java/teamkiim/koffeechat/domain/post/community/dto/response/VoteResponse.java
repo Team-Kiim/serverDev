@@ -28,6 +28,7 @@ public class VoteResponse {
         return VoteResponse.builder()
                 .title(vote.getTitle())
                 .voteItemResponseList(voteItemResponseList)
+                .isMemberVoted(isMemberVoted)
                 .build();
     }
 

@@ -3,9 +3,12 @@ package teamkiim.koffeechat.domain.auth.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import teamkiim.koffeechat.domain.member.domain.Member;
+import teamkiim.koffeechat.domain.post.community.dto.response.CommunityPostResponse;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -22,7 +25,7 @@ public @interface AuthApiDocument {
      */
     @Operation(summary = "회원가입", description = "사용자가 회원가입 요청을 한다.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "회원가입 성공"),
+            @ApiResponse(responseCode = "201", description = "회원가입 성공"),
             @ApiResponse(responseCode = "409", content = @Content(mediaType = "application/json",
                     examples = {@ExampleObject(name = "회원가입 요청한 이메일과 동일한 이메일이 이미 존재하는 경우",
                             value = "{\"code\": 409, \"message\": \"이미 회원가입된 이메일입니다.\"}")}
@@ -30,7 +33,8 @@ public @interface AuthApiDocument {
     })
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.RUNTIME)
-    @interface SignUpApiDoc {}
+    @interface SignUpApiDoc {
+    }
 
     /**
      * 로그인
@@ -49,7 +53,8 @@ public @interface AuthApiDocument {
     })
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.RUNTIME)
-    @interface loginApiDoc {}
+    @interface loginApiDoc {
+    }
 
     /**
      * 로그아웃
@@ -60,5 +65,6 @@ public @interface AuthApiDocument {
     })
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.RUNTIME)
-    @interface logoutApiDoc {}
+    @interface logoutApiDoc {
+    }
 }

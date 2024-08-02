@@ -1,12 +1,10 @@
 package teamkiim.koffeechat.domain.vote.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import teamkiim.koffeechat.domain.vote.repository.VoteItemRepository;
-import teamkiim.koffeechat.global.exception.CustomException;
-import teamkiim.koffeechat.global.exception.ErrorCode;
 import teamkiim.koffeechat.domain.member.domain.Member;
 import teamkiim.koffeechat.domain.member.repository.MemberRepository;
 import teamkiim.koffeechat.domain.post.common.domain.Post;
@@ -15,11 +13,14 @@ import teamkiim.koffeechat.domain.vote.controller.dto.SaveVoteRecordRequest;
 import teamkiim.koffeechat.domain.vote.domain.Vote;
 import teamkiim.koffeechat.domain.vote.domain.VoteItem;
 import teamkiim.koffeechat.domain.vote.domain.VoteRecord;
-import teamkiim.koffeechat.domain.vote.repository.VoteRecordRepository;
-import teamkiim.koffeechat.domain.vote.repository.VoteRepository;
 import teamkiim.koffeechat.domain.vote.dto.SaveVoteRecordServiceDto;
 import teamkiim.koffeechat.domain.vote.dto.request.ModifyVoteServiceRequest;
 import teamkiim.koffeechat.domain.vote.dto.request.SaveVoteServiceRequest;
+import teamkiim.koffeechat.domain.vote.repository.VoteItemRepository;
+import teamkiim.koffeechat.domain.vote.repository.VoteRecordRepository;
+import teamkiim.koffeechat.domain.vote.repository.VoteRepository;
+import teamkiim.koffeechat.global.exception.CustomException;
+import teamkiim.koffeechat.global.exception.ErrorCode;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -61,9 +62,7 @@ public class VoteService {
         Vote vote = saveVoteServiceRequest.toEntity(post, saveVoteServiceRequest.getTitle());  //투표 생성
         Vote savedVote = voteRepository.save(vote);
 
-        for (VoteItem voteItem : vote.getVoteItems()) {
-            voteItemRepository.save(voteItem);
-        }
+        voteItemRepository.saveAll(vote.getVoteItems());
 
         return savedVote;
     }
@@ -112,7 +111,10 @@ public class VoteService {
                 .orElseThrow(() -> new CustomException(ErrorCode.VOTE_NOT_FOUND));
 
         List<VoteItem> voteItemList = voteItemRepository.findAllByPostAndIds(post, saveVoteRecordRequest.getItems());  //투표한 항목 존재 여부 확인
-        if (voteItemList.isEmpty()) throw new CustomException(ErrorCode.VOTE_ITEM_NOT_FOUND);
+
+        if (!saveVoteRecordRequest.getItems().isEmpty() && voteItemList.isEmpty()) {
+            throw new CustomException(ErrorCode.VOTE_ITEM_NOT_FOUND);
+        }
 
         List<VoteRecord> voteRecordList = voteRecordRepository.findByVoteAndMember(vote, member);  //기존 투표 기록
         if (!voteRecordList.isEmpty()) { //기존 투표 기록 삭제
@@ -124,17 +126,23 @@ public class VoteService {
             voteRecordRepository.deleteAll(voteRecordList);
         }
 
-        for (VoteItem votedItem : voteItemList) {  //투표 항목들에 대해 투표 기록 생성
-            VoteRecord voteRecord = VoteRecord.create(member, votedItem);
-            VoteRecord saveVoteRecord = voteRecordRepository.save(voteRecord);
-            votedItem.addVoteRecord(saveVoteRecord);  //연관관계 주입
-            votedItem.addVoteCount();                 //투표 수 ++
+        //모두 투표 취소한 경우
+//        if (saveVoteRecordRequest.getItems().isEmpty()) return ResponseEntity.status(HttpStatus.CREATED).body("투표 기록 초기화");
+
+        //재투표 항목들에 대해 투표 기록 생성
+        if (!saveVoteRecordRequest.getItems().isEmpty()) {
+            for (VoteItem votedItem : voteItemList) {
+                VoteRecord voteRecord = VoteRecord.create(member, votedItem);
+                VoteRecord saveVoteRecord = voteRecordRepository.save(voteRecord);
+                votedItem.addVoteRecord(saveVoteRecord);  //연관관계 주입
+                votedItem.addVoteCount();                 //투표 수 ++
+            }
         }
 
         List<SaveVoteRecordServiceDto> saveVoteRecordServiceDto = vote.getVoteItems().stream()
                 .map(SaveVoteRecordServiceDto::of).collect(Collectors.toList());
 
-        return ResponseEntity.ok(saveVoteRecordServiceDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(saveVoteRecordServiceDto);
     }
 
 }

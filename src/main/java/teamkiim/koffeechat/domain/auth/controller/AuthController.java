@@ -1,16 +1,12 @@
 package teamkiim.koffeechat.domain.auth.controller;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.ExampleObject;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import teamkiim.koffeechat.domain.auth.controller.dto.LoginRequest;
 import teamkiim.koffeechat.domain.auth.controller.dto.SignUpRequest;
@@ -19,6 +15,7 @@ import teamkiim.koffeechat.domain.auth.service.AuthService;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/auth")
+@Validated
 @Tag(name = "인증 API")
 public class AuthController {
 
@@ -53,6 +50,5 @@ public class AuthController {
 
         return authService.logout(request, response);
     }
-
 
 }

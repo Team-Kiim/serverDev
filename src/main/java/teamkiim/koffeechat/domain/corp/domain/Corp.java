@@ -13,7 +13,24 @@ public class Corp {
     @Column(name = "corp_id")
     private Long id;
 
-    private String corpName;
+    private String corpName;               //회사 이름
 
-    private String corpEmailDomain;
+    private String corpEmailDomain;        //회사 이메일 도메인
+
+    @Enumerated(EnumType.STRING)
+    private Verified verified;               //이메일 도메인 검증 상태
+
+    /**
+     * 생성자
+     */
+    public Corp(String corpName, String corpEmailDomain, Verified verified) {
+        this.corpName=corpName;
+        this.corpEmailDomain=corpEmailDomain;
+        this.verified=verified;
+    }
+
+    //== 비즈니스 로직 ==//
+    public void statusModify(Verified verified) {
+        this.verified = verified;
+    }
 }

@@ -3,6 +3,7 @@ package teamkiim.koffeechat.domain.memberfollow.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,7 +55,7 @@ public class MemberFollowService {
             member.addFollowingCount();             //회원의 팔로잉 수 ++
             followingMember.addFollowerCount();     //회원이 구독한 회원의 팔로워 수 ++
         }
-        return ResponseEntity.ok(followingMember.getFollowerCount());
+        return ResponseEntity.status(HttpStatus.CREATED).body(followingMember.getFollowerCount());
     }
 
     /**

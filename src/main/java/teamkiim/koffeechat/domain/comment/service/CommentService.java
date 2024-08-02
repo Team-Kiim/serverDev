@@ -1,6 +1,8 @@
 package teamkiim.koffeechat.domain.comment.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,7 +48,7 @@ public class CommentService {
 
         post.addComment(saveComment);               // 양방향 연관관계 주입
 
-        return ResponseEntity.ok("댓글 저장 완료");
+        return ResponseEntity.status(HttpStatus.CREATED).body("댓글 저장 완료");
     }
 
     /**
@@ -62,7 +64,7 @@ public class CommentService {
 
         comment.modify(modifyCommentServiceRequest.getContent(), modifyCommentServiceRequest.getCurrDateTime());
 
-        return ResponseEntity.ok("댓글 수정 완료");
+        return ResponseEntity.status(HttpStatus.CREATED).body("댓글 수정 완료");
     }
 
     /**

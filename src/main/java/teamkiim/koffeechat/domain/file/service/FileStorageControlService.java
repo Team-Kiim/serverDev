@@ -55,7 +55,7 @@ public class FileStorageControlService {
     /**
      * 회원 프로필 이미지 단건 저장
      * @param multipartFile 실제 파일
-     * @param memberId 회원 PK
+     * @param member 회원
      */
     public ProfileImageInfoResponse saveFile(Member member, MultipartFile multipartFile){
 

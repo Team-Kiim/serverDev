@@ -3,6 +3,8 @@ package teamkiim.koffeechat.domain.auth.service;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -29,7 +31,7 @@ public class AuthService {
     /**
      * 회원가입
      * @param signUpServiceRequest 회원가입 요청 dto
-     * @return ok
+     * @return HttpStatus.CREATED
      */
     @Transactional
     public ResponseEntity<?> signUp(SignUpServiceRequest signUpServiceRequest){
@@ -44,7 +46,7 @@ public class AuthService {
 
         memberRepository.save(member);
 
-        return ResponseEntity.ok("회원가입이 완료되었습니다.");
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     /**
